@@ -10,16 +10,46 @@ phone (Larix Broadcaster) --RTMP over Wi-Fi hotspot--> ffmpeg --+--> recordings/
 ## Requirements (laptop)
 
 - A Wi-Fi adapter that supports access-point (AP) mode — check with `iw list | grep -A8 "Supported interface modes"` (look for `AP`)
-- NetworkManager (`nmcli`), `ffmpeg`, Python 3 with `opencv-python` (with GUI support) and `numpy`
-- Manjaro/Arch: `sudo pacman -S ffmpeg python-opencv python-numpy`
+- NetworkManager (`nmcli`), `ffmpeg`, Python 3
+- Python packages `opencv-python` and `numpy` (installed automatically by `quickstart.sh`, see below)
+
+Manjaro/Arch system packages: `sudo pacman -S ffmpeg networkmanager python`
 
 ## Quick start
+
+```
+./quickstart.sh
+```
+
+This:
+
+1. Creates a virtualenv in `.venv` on first run and activates it
+2. Installs `opencv-python` and `numpy` into it if they aren't already importable
+3. Brings up the Wi-Fi hotspot
+4. Starts delaycam fullscreen with an 8 s delay and waits for the phone
+
+The hotspot is taken down again when you quit. Change the delay with `DELAY=5 ./quickstart.sh`; any extra arguments are passed to `delaycam.py`, e.g. `./quickstart.sh -H 540`.
+
+Once the phone is streaming, the picture appears after the delay has elapsed.
+
+### Manual Python setup (virtualenv + pip)
+
+If you'd rather set up the environment yourself:
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -c "import cv2; print(cv2.__version__)"
+```
+
+Then run it with the venv active:
 
 ```
 ./delaycam.py --hotspot --delay 8 --fullscreen
 ```
 
-This brings up the hotspot, then waits for the phone. Once the phone is streaming, the picture appears after the delay has elapsed.
+Use `opencv-python`, **not** `opencv-python-headless`: the headless build has no window support, so the display won't work. Alternatively, on Manjaro/Arch you can skip the venv and use the system packages: `sudo pacman -S python-opencv python-numpy`.
 
 ## Phone setup
 
